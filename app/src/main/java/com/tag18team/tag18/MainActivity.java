@@ -39,8 +39,8 @@ public class MainActivity extends AppCompatActivity
         fillTagTab();
         DBhandler db=new DBhandler(this);
         db.createNewTable("TAGS", "table with tags and their settings");
-        Cursor c=db.getTable(0);
-        final String s="_";
+        Cursor c=db.getFullTable();
+        final String s=""+c.getCount();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
