@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+import android.util.Log;
 
 // nav_view -menu (left)
 // tag_view -tag menu (right)
@@ -31,21 +32,16 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         fillTagTab();
-        DBhandler db=new DBhandler(this);
-        db.createNewTable("TAGS", "table with tags and their settings");
-        Cursor c=db.getFullTable();
-        final String s=""+c.getCount();
+        //Cursor c=db.getTag(0);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, s, Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "s", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -82,13 +78,24 @@ public class MainActivity extends AppCompatActivity
             //tagToggleButton.setTextColor(0xffff0000); //красный
             suggestionsLayout.addView(tagView);
         }
+        DBhandler db=new DBhandler(this);
+        db.createNewTag("TAGS", "table with tags and their settings");
+        db.createNewTag("1","first one");
+        db.createNewTag("2","another one");
+        db.updateTag(22, "newNAE","ff",true);
+        String[][] s=db.getAllTags();
+        for (int i=0;i<s.length;i++)
+        {
+            Log.d("log", s[i][0]+"/"+s[i][1]+"/"+s[i][2]+"/"+s[i][3]);
+        }
+        db.dropTags();
     }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        } else{
             super.onBackPressed();
         }
     }
