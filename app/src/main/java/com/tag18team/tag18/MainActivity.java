@@ -79,16 +79,24 @@ public class MainActivity extends AppCompatActivity
             suggestionsLayout.addView(tagView);
         }
         DBhandler db=new DBhandler(this);
-        db.createNewTag("TAGS", "table with tags and their settings");
-        db.createNewTag("1","first one");
-        db.createNewTag("2","another one");
-        db.updateTag(22, "newNAE","ff",true);
-        String[][] s=db.getAllTags();
+        db.dropFiles();
+        db.dropTags();
+        long a1=db.addFile("/home/hello");
+        long a2=db.addFile("/root/myfile");
+        long t1=db.addTag("tag1","desc1");
+        long t2=db.addTag("TAG2", "second tag");
+        db.setTag(a1, t1);
+        db.setTag(a2,t2);
+        db.setTag(a1,t2);
+        db.unsetTag(a1,t2);
+        String[][] s=db.getAllRows("TAGS");
+        String tag_list="";
         for (int i=0;i<s.length;i++)
         {
-            Log.d("log", s[i][0]+"/"+s[i][1]+"/"+s[i][2]+"/"+s[i][3]);
+            tag_list+= s[i][0]+"|"+s[i][1]+"|"+s[i][2]+"|"+s[i][3]+'\n';
         }
-        db.dropTags();
+        TextView tv=(TextView)findViewById(R.id.textView7);
+        tv.setText(tag_list);
     }
     @Override
     public void onBackPressed() {
