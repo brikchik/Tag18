@@ -64,8 +64,10 @@ public class DBhandler extends SQLiteOpenHelper{
         values.put("DESCRIPTION",DESC);
         values.put("IS_FAVOURITE",0);
         if (favourite) values.put("IS_FAVOURITE",1);
-        return db.update(TAG_TABLE, values, TAG_ID + "=" + rowId,
+        boolean success=db.update(TAG_TABLE, values, TAG_ID + "=" + rowId,
                 null) > 0;
+        db.close();
+        return success;
     }
     public void deleteTag(long rowId) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -85,6 +87,7 @@ public class DBhandler extends SQLiteOpenHelper{
     public void dropTags(){
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TAG_TABLE,null,null);
+        db.close();
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     public long addFile(String path){
@@ -97,7 +100,6 @@ public class DBhandler extends SQLiteOpenHelper{
         {
             Log.d("log","It's a folder");
         }
-        Log.d("files",name);
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("NAME",name);
@@ -112,6 +114,7 @@ public class DBhandler extends SQLiteOpenHelper{
         ContentValues values = new ContentValues();
         values.put("PATH",newPath);
         int success=db.update(FILE_TABLE,values,FILE_ID+"="+fileID, null);
+        db.close();
         Log.d("DB","path of file "+fileID+" changed to "+newPath);
         return (success==1);
     }
@@ -126,6 +129,7 @@ public class DBhandler extends SQLiteOpenHelper{
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(REL_TABLE,null,null);
         db.delete(FILE_TABLE,null,null);
+        db.close();
     }
     public void setTag(long fileID, long tagID){ // do we REALLY need to check success?
         SQLiteDatabase db = this.getWritableDatabase();
@@ -143,6 +147,7 @@ public class DBhandler extends SQLiteOpenHelper{
     public void unsetTag(long fileID, long tagID){ // do we REALLY need to check success?
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(REL_TABLE, FILE_ID + "=" + fileID +" and "+ TAG_ID+"="+tagID, null);
+        db.close();
         Log.d("DB","pair removed from RELATIONS: "+fileID+":"+tagID);
     };
     public String[][] getAllRows(String table) { // files and relations
@@ -158,12 +163,12 @@ public class DBhandler extends SQLiteOpenHelper{
             s[i][3]=""+c.getInt(3);
             c.moveToNext();
         }
+        db.close();
         return s;
     }
     ///////////////////////////////////////////////////////////////////////////////////////
     public String[][] getFilesWithTags(int[] tagIDs){
         String query="";
-
         for (int i=0; i< tagIDs.length;i++){
             query+="SELECT DISTINCT FILES.FILE_ID, NAME, PATH, IS_EXTERNAL FROM FILES JOIN RELATIONS " +
                     "ON FILES.FILE_ID = RELATIONS.FILE_ID WHERE RELATIONS.TAG_ID="+tagIDs[i];
@@ -175,7 +180,7 @@ public class DBhandler extends SQLiteOpenHelper{
         Cursor c=db.rawQuery(query,null);
         /////////////////////// we may have to limit row number if database is too big
         int NUMBER=c.getCount();
-        if (NUMBER>100) NUMBER=100;
+        //if (NUMBER>100) NUMBER=100;
         /////////////////////// is to be fixed one day
         c.moveToFirst();
         Log.d("count", ""+c.getCount());
@@ -189,6 +194,7 @@ public class DBhandler extends SQLiteOpenHelper{
             c.moveToNext();
             Log.d("step",s[i][0]+' '+s[i][1]+' '+s[i][2]+' '+s[i][3]);
         }
+        db.close();
         return s;
     }
 }

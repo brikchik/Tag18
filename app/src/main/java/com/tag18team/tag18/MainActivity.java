@@ -1,9 +1,18 @@
 package com.tag18team.tag18;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.FileObserver;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.os.EnvironmentCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,43 +24,81 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 import android.util.Log;
+
+import java.io.File;
+import java.nio.file.FileSystem;
+import java.util.Arrays;
+import java.util.List;
 
 // nav_view -menu (left)
 // tag_view -tag menu (right)
 // main menu duplicates left one with icons
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
+    final int MY_PERMISSIONS_REQUEST_READ_STORAGE=1;
+    private void fillFileDatabase(){
+        Runnable afsp=new AsyncFileSystemParser(this);
+        new Thread(afsp).start();
+        DBhandler db=new DBhandler(this);
+        String[][] s=db.getAllRows("TAGS");
+        Log.d("count:",""+s.length);
+        String tag_list="";
+        for (String[] s1:s){
+            tag_list+= s1[0]+"|"+s1[1]+"|"+s1[2]+"|"+s1[3]+'\n';
+        }
+        TextView tv=(TextView)findViewById(R.id.textView7);
+        tv.setText(tag_list);
+        }
+    private void fillFileView() {
+        DBhandler db=new DBhandler(this);
+        String[][] allFiles=db.getAllRows("FILES");
+        String[] files=new String[allFiles.length];
+        for(int row = 0; row < allFiles.length; row++)
+        {
+            files[row] = allFiles[row][1];
+        }
+        GridView gridView = (GridView) findViewById(R.id.gridView1);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, files);
+        gridView.setAdapter(adapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                Toast.makeText(getApplicationContext(),
+                        ((TextView) v).getText(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_READ_STORAGE);
+        } // ask for permission in advance
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        NavigationView tagView = (NavigationView) findViewById(R.id.tag_view);
+        tagView.setNavigationItemSelectedListener(this);
         fillTagTab();
-        //Cursor c=db.getTag(0);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "s", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        fillFileDatabase();
+        fillFileView();
     }
     private void fillTagTab(){
-        /*ListView tagsView = (ListView) findViewById(R.id.allTags);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, new String[]{"a","b","c","d"});
-        tagsView.setAdapter(adapter);
-*/
         ButtonLayout tagsLayout = (ButtonLayout) findViewById(R.id.chosenTags);
         LayoutInflater layoutInflater = getLayoutInflater();
         String tag;
@@ -107,7 +154,6 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -127,7 +173,6 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_send) {
 
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
