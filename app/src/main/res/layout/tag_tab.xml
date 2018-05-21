@@ -18,20 +18,24 @@
     app:layout_constraintTop_toTopOf="parent"
     />
 
-<ScrollView
-    android:layout_weight="1"
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:orientation="vertical">
-    ///////////////////////////////////////////////////////////
-    <TextView
-        android:id="@+id/textView7"
-        android:layout_width="match_parent"
+    <RelativeLayout
+        android:id="@+id/file_layout"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:text="Любимые теги:grwgsssssssssssssssssssu56i6764thu64trjy5u64yhet4u6jrymj4u6jyr46jyrj4jyrj4rmyj4rmyj4rj4r4r4jyr4yr4jyr4jyrj4yr4r4yghetyjre346ujyrtherhjyrngteht4wjyrsngetha4jrngdehtarstherahtsrjngdztehjryntheratdgnzbhetsjryhtrwahetzdgnfbhrwaetsjdnsfgrwhetdgnfrhetjrhrwyestjsfgwrestdgrway5esthy53sethy5urjytherwyaestjhzsgefqt4y35eshtdzhetsurjydhgrwy5ehtzfsgrehsthrwtarehtdfsrehtdgfsrwyesthxdgnbfsrwehtxgdnfsgwrehtdfbsgwrehtdxgnbfsgewrehtdfbsgwryethdfsgefqwtrehtdfbsgrwyehtsfgaefsdnjtuergsdfhteyrwsgfbdghteyrgsfbdhterygsfbdhteyrwgsfhtu645yerwegsrhdtjyri75u64y5wt4qeghtjryi7564u5yergsfdgnt7i5u46y53wrsfdgnytki75uye5rgsfdhtu64y5ethjfktu4y53wt4efadgshteu64y53wrhdgnfhjryueytrwgsfbdgnfyjre5wrgsfbdgjyru64ye5rfgncfjyrthesfdhgtjuy5ethjry53etjyti7rjfyi75u645yuryjkugtiu6yjhwtgriurghp9q3rughp3q87tfupd9igheruaighrpeiugjpovifsjvpuijdn;uigaje;ogijnhaowirughrjpoiguhoug8isdjioghsdyaigoudsjoivhdposhvjs;afiovjsfoivhsdipvhsdoighfpiohpivcjidfusssssssssssssssssssrrrrrrrrrrrrrrrrgrsfefkwuukegylieufgwileudfbiaudfgaeibjfkbifegeqiufjnidufgiufqebifugiudsafgdsilugliushiudshilguliughlesiufjbqeilufhewilufbe"
-        android:padding="5dp"
-        android:background="#ff0000"/>
-</ScrollView>
+        android:layout_width="wrap_content"
+        >
+        <GridView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/tagsGridView"
+            android:numColumns="auto_fit"
+            android:gravity="center"
+            android:columnWidth="200dp"
+
+            android:stretchMode="columnWidth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:longClickable="true">
+        </GridView>
+    </RelativeLayout>
 <View
     android:id="@+id/divider"
     android:layout_gravity="bottom"

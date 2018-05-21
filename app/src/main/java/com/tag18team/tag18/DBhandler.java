@@ -168,6 +168,7 @@ public class DBhandler extends SQLiteOpenHelper{
     }
     ///////////////////////////////////////////////////////////////////////////////////////
     public String[][] getFilesWithTags(int[] tagIDs){
+        if (tagIDs==null)return getAllRows("FILES");
         String query="";
         for (int i=0; i< tagIDs.length;i++){
             query+="SELECT DISTINCT FILES.FILE_ID, NAME, PATH, IS_EXTERNAL FROM FILES JOIN RELATIONS " +

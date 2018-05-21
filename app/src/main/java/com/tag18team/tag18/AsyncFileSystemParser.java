@@ -1,32 +1,38 @@
 package com.tag18team.tag18;
 
 import android.content.Context;
-import android.os.Environment;
 import android.util.Log;
-
 import java.io.File;
+import java.util.Vector;
 
 public class AsyncFileSystemParser implements Runnable{
     DBhandler db;
+    String[] directoryList;
+    Vector<String> filesPresent=new Vector<String>();
     public void directory(File dir, DBhandler db) {
+        if (!dir.isDirectory())return;
         File[] files = dir.listFiles();
         for (File file : files) {
-            if (!(file.getAbsolutePath().contains("/Android/")) && //system files
-                    !(file.getAbsolutePath().contains("/."))) //hidden files starting with .
+            if (file.isFile() && !(filesPresent.contains(file.getAbsolutePath())))
             {
-                if ((file.listFiles() != null))
-                    directory(file, db);
-                else
-                    db.addFile(dir.getAbsolutePath());
+                long fileID=db.addFile(file.getAbsolutePath());
+                if (file.getAbsolutePath().endsWith("pdf"))db.setTag(fileID, 1);
             }
+            else if ((file.listFiles() != null))directory(file, db);
         }
     }
     public void run(){
-        String path = Environment.getExternalStorageDirectory().toString();
-        File f = new File(path+"");
-        directory(f, db);
+        Log.d("run","started");
+        String[][] existingFiles=db.getAllRows("FILES");
+        for (String[] row:existingFiles) filesPresent.add(row[2]);
+        for (String dirPath: directoryList)
+        {
+            File f = new File(dirPath);
+            directory(f, db);
+        }
     };
-    public AsyncFileSystemParser(Context ctx){
+    public AsyncFileSystemParser(Context ctx, String[] pathList){
         db=new DBhandler(ctx);
+        directoryList=pathList;
     }
 }
