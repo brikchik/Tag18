@@ -5,17 +5,17 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
-        <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/folder_import"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:title="Добавить папку" />
         <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:id="@+id/file_import"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Добавить файл" />
+        <item
+            android:id="@+id/clear"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Полный сброс" />
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"

@@ -5,8 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:background="@drawable/ic_launcher_background"
+    android:background="#C1876B"
     tools:openDrawer="start">
 
     <include
@@ -27,7 +26,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        >
         <include layout="@layout/tag_tab" />
     </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>

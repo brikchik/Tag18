@@ -6,6 +6,7 @@
     android:layout_height="match_parent">
     android:layout_marginTop="50dp"
     android:layout_gravity="bottom"
+    android:fitsSystemWindows="true"
     >
 <TextView
     android:layout_gravity="start"
@@ -54,23 +55,4 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#ff0000" />
-<TextView
-    android:padding="5dp"
-    android:id="@+id/chosenTagsText"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#ffff00"
-    android:text="Выбранные теги:" />
-<com.tag18team.tag18.ButtonLayout
-    android:id="@+id/chosenTags"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#ffff00" />
-<EditText
-    android:id="@+id/editText"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:ems="15"
-    android:inputType="textPersonName"
-    android:text="search" />
 </LinearLayout>

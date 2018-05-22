@@ -18,7 +18,7 @@ public class AudioInput extends Activity {
         Intent speechIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         speechIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak please");
-        startActivity(speechIntent);
+        //startActivity(speechIntent);
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
