@@ -1,8 +1,10 @@
 package com.tag18team.tag18;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.speech.RecognizerIntent;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,12 +14,11 @@ import static android.support.v4.app.ActivityCompat.startActivityForResult;
 
 public class AudioInput extends Activity {
     private int RESULT_SPEECH_TO_TEXT;
-
-    public AudioInput(){onCreate();}
-    public void onCreate(){
+    public AudioInput(Context ctx){
         Intent speechIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         speechIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak please");
+        Toast.makeText(ctx,"(Здесь должен быть микрофон)", Toast.LENGTH_SHORT).show();
         //startActivity(speechIntent);
     }
     @Override

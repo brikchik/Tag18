@@ -7,11 +7,7 @@
         <item
             android:id="@+id/folder_import"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Добавить папку" />
-        <item
-            android:id="@+id/file_import"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Добавить файл" />
+            android:title="Добавить папку или файл" />
         <item
             android:id="@+id/clear"
             android:icon="@drawable/ic_menu_manage"
@@ -22,12 +18,12 @@
             android:title="Tools" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:id="@+id/nav_help"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Помощь" />
             <item
                 android:id="@+id/nav_end"
                 android:icon="@drawable/ic_menu_send"

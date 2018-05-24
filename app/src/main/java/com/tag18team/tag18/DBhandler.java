@@ -1,13 +1,17 @@
-package com.tag18team.tag18;
+﻿package com.tag18team.tag18;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.*;
 import android.database.sqlite.*;
+import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
+
 public class DBhandler extends SQLiteOpenHelper{
     private static final String DATABASE_NAME = "data.db";
     private static final int DATABASE_VERSION = 1;
+    private static String device_id="not_set";
     // таблицы
     private static final String TAG_TABLE = "TAGS";
     private static final String FILE_TABLE = "FILES";
@@ -21,23 +25,22 @@ public class DBhandler extends SQLiteOpenHelper{
     // формируем запрос для создания базы данных
     private static final String CREATE_TAGS = "create table "
             + TAG_TABLE + "(" + TAG_ID + " integer primary key autoincrement, " + "NAME"
-            + " text not null, " + "DESCRIPTION" + " text, " + "IS_FAVOURITE" + " integer not null default 0"+");";
+            + " text not null, " + "DESCRIPTION" + " text, " + "IS_FAVOURITE" + " integer not null default 0,"+" DEVICE text not null"+");";
     private static final String CREATE_FILES = "create table "
             + FILE_TABLE + "(" + FILE_ID + " integer primary key autoincrement, " + "NAME"
-            + " text not null, " + "PATH" + " text not null, " + "IS_EXTERNAL" + " integer not null default 0"+");";
+            + " text not null, " + "PATH" + " text not null, " + "IS_EXTERNAL" + " integer not null default 0,"+" DEVICE text not null"+");";
     private static final String CREATE_RELATIONS = "create table "
             + REL_TABLE + "(" + FILE_ID + " integer not null, " + TAG_ID
-            + " integer not null, primary key("+FILE_ID+","+"TAG_ID"+"));";
+            + " integer not null, DEVICE text not null, primary key("+FILE_ID+","+"TAG_ID"+"));";
     public DBhandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        device_id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TAGS);
         db.execSQL(CREATE_FILES);
         db.execSQL(CREATE_RELATIONS);
-        Log.d("log","DB created");
-        Log.d("log", CREATE_TAGS);
         }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -55,6 +58,7 @@ public class DBhandler extends SQLiteOpenHelper{
         values.put("NAME",NAME);
         values.put("DESCRIPTION",DESC);
         values.put("IS_FAVOURITE",0);
+        values.put("DEVICE", device_id);
         long row = db.insert(TAG_TABLE, null, values);
         db.close();
         return row; //номер строки или 1
@@ -65,6 +69,7 @@ public class DBhandler extends SQLiteOpenHelper{
         values.put("NAME",NAME);
         values.put("DESCRIPTION",DESC);
         values.put("IS_FAVOURITE",0);
+        values.put("DEVICE", device_id);
         if (favourite) values.put("IS_FAVOURITE",1);
         boolean success=db.update(TAG_TABLE, values, TAG_ID + "=" + rowId,
                 null) > 0;
@@ -87,6 +92,7 @@ public class DBhandler extends SQLiteOpenHelper{
         values.put("NAME",name);
         values.put("PATH",path);
         values.put("IS_EXTERNAL",0);
+        values.put("DEVICE", device_id);
         long row = db.insert(FILE_TABLE, null, values);
         db.close();
         return row;
@@ -129,6 +135,7 @@ public class DBhandler extends SQLiteOpenHelper{
             ContentValues values = new ContentValues();
             values.put("FILE_ID", fileID);
             values.put("TAG_ID", tagID);
+            values.put("DEVICE", device_id);
             try {
                 long row = db.insert(REL_TABLE, null, values);
                 Log.d("DB", "pair inserted into RELATIONS: " + fileID + ":" + tagID);
@@ -140,19 +147,13 @@ public class DBhandler extends SQLiteOpenHelper{
     };
     public void setTag(long fileID, long tagID){ // do we REALLY need to check success?
         long a=getIfExists("RELATIONS","TAG_ID","FILE_ID", ""+fileID);
-        Log.d("DB",""+a);
-        Log.d("DB",""+tagID);
         SQLiteDatabase db = this.getWritableDatabase();
         if (a!=tagID) {
             ContentValues values = new ContentValues();
             values.put("FILE_ID", fileID);
             values.put("TAG_ID", tagID);
-            try {
-                long row = db.insert(REL_TABLE, null, values);
-                Log.d("DB", "pair inserted into RELATIONS: " + fileID + ":" + tagID);
-            } catch (SQLException e) {
-                Log.d("DB", "pair already exists in RELATIONS: " + fileID + ":" + tagID);
-            } // case pair exists
+            values.put("DEVICE", device_id);
+            try { long row = db.insert(REL_TABLE, null, values); } catch (SQLException e) {} // case pair exists
         }
         if(db.isOpen())db.close();
     };

@@ -11,7 +11,7 @@ public class AsyncFileSystemParser implements Runnable{
     private void fileAdd(File file){
         String path=file.getAbsolutePath();
         long fileID=db.addFile(path);
-        db.setTag(fileID, "Все файлы");
+        db.setTag(fileID, "все");
         if ((path.lastIndexOf('.')+3)!=path.length()) {
             String ending = path.substring(path.lastIndexOf('.')+1, path.length());
             Log.d("ENDING", ending);
