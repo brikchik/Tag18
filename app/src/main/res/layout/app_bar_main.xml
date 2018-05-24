@@ -9,7 +9,7 @@
         <RelativeLayout
             android:id="@+id/search_layout"
             android:layout_width="match_parent"
-            android:background="#bbbb6b"
+            android:background="#bbbbbb"
             android:layout_height="wrap_content">
             <EditText
                 android:id="@+id/search_box"
@@ -54,33 +54,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                     <Button
-                        android:id="@+id/menu_open_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="#f4fa1f56"
-                        android:text="меню"
-                        android:textColor="#ffffff"/>
-                    <Button
-                        android:id="@+id/folder_add_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="#f0aa0056"
-                        android:text="+папка"
-                        android:textColor="#ffffff"/>
-                    <Button
-                        android:id="@+id/listen_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="#ff050f56"
                         android:text="микрофон"
-                        android:textColor="#ffffff" />
+                        android:textColor="#ffffff"
+                        android:onClick="recordSound"/>
                     <Button
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="#000000"
-                        android:text="теги"
-                        android:id="@+id/tags_open_button"
-                        android:textColor="#ffffff"/>
+                        android:background="#f4fa1f56" />
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#fff5ff06" />
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#ff05ff56" />
                 </LinearLayout>
         </RelativeLayout>
     </LinearLayout>
