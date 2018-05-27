@@ -30,14 +30,18 @@ public class DBhandler extends SQLiteOpenHelper{
             + " integer not null, primary key("+FILE_ID+","+"TAG_ID"+"));";
     public DBhandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        addTag("все", "Все файлы имеют этот тег");
+        addTag("любимое","Для быстого доступа к избранному");
+        addTag("хлам","Позволяет пометить ненужные файлы");
+        addTag("изображение","Для известных графических форматов");
+        addTag("документ","Для известных форматов документации");
+        addTag("программа","Для исполняемых файлов");
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TAGS);
         db.execSQL(CREATE_FILES);
         db.execSQL(CREATE_RELATIONS);
-        Log.d("log","DB created");
-        Log.d("log", CREATE_TAGS);
         }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -48,7 +52,6 @@ public class DBhandler extends SQLiteOpenHelper{
     }
     public long addTag(String NAME, String DESC) {
         long ID=getIfExists("TAGS", "TAG_ID", "NAME", NAME);
-        Log.d("addtag",""+ID);
         if (ID!=-1)return ID;
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -73,6 +76,7 @@ public class DBhandler extends SQLiteOpenHelper{
     }
     public void deleteTag(long rowId) {
         SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(REL_TABLE, TAG_ID + "=" + rowId, null);
         db.delete(TAG_TABLE, TAG_ID + "=" + rowId, null);
         db.close();
     }
@@ -121,27 +125,10 @@ public class DBhandler extends SQLiteOpenHelper{
     }
     public void setTag(long fileID, String tagName){ // do we REALLY need to check success?
         long tagID=getIfExists("TAGS","TAG_ID", "NAME",tagName);
-        long a=getIfExists("RELATIONS","TAG_ID","FILE_ID", ""+fileID);
-        Log.d("DB_tagID",""+tagID);
-        Log.d("DB_relationID",""+a);
-        SQLiteDatabase db = this.getWritableDatabase();
-        if (a!=tagID || a==-1) {
-            ContentValues values = new ContentValues();
-            values.put("FILE_ID", fileID);
-            values.put("TAG_ID", tagID);
-            try {
-                long row = db.insert(REL_TABLE, null, values);
-                Log.d("DB", "pair inserted into RELATIONS: " + fileID + ":" + tagID);
-            } catch (Exception e) {
-                Log.d("DB", "pair already exists in RELATIONS: " + fileID + ":" + tagID);
-            } // case pair exists
-        }
-        if(db.isOpen())db.close();
+        setTag(fileID, tagID);
     };
     public void setTag(long fileID, long tagID){ // do we REALLY need to check success?
         long a=getIfExists("RELATIONS","TAG_ID","FILE_ID", ""+fileID);
-        Log.d("DB",""+a);
-        Log.d("DB",""+tagID);
         SQLiteDatabase db = this.getWritableDatabase();
         if (a!=tagID) {
             ContentValues values = new ContentValues();
@@ -189,7 +176,6 @@ public class DBhandler extends SQLiteOpenHelper{
                 if (i + 1 != tagNames.length) query += " INTERSECT ";
             }
             query += ";";
-            Log.d("DB", "QUERY for getting files: \n" + query);
             SQLiteDatabase db = this.getReadableDatabase();
             Cursor c = db.rawQuery(query, null);
             /////////////////////// we may have to limit row number if database is too big
@@ -197,7 +183,6 @@ public class DBhandler extends SQLiteOpenHelper{
             //if (NUMBER>100) NUMBER=100;
             /////////////////////// is to be fixed one day
             c.moveToFirst();
-            Log.d("count", "" + c.getCount());
             String[][] s = new String[c.getCount()][4];
             for (int i = 0; i < NUMBER; i++) {
                 s[i][0] = "" + c.getInt(0);

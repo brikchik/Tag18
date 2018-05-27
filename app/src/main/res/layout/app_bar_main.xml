@@ -9,40 +9,41 @@
         <RelativeLayout
             android:id="@+id/search_layout"
             android:layout_width="match_parent"
-            android:background="#bbbbbb"
+            android:background="#bbbb6b"
             android:layout_height="wrap_content">
             <EditText
                 android:id="@+id/search_box"
                 android:layout_width="fill_parent"
-                android:layout_marginEnd="100dp"
                 android:layout_height="wrap_content"
                 android:text=""
                 android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/clear_button"
                 android:singleLine="true"/>
             <Button
+                android:layout_toStartOf="@id/search_button"
+                android:id="@+id/clear_button"
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:text="X"
+                android:onClick="clearSearchBox"/>
+            <Button
                 android:id="@+id/search_button"
-                android:layout_width="100dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:text="SEARCH"
+                android:text="ИСКАТЬ"
                 android:onClick="fillFiles"/>
         </RelativeLayout>
         <RelativeLayout
             android:id="@+id/file_layout"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_width="wrap_content"
             >
-            <GridView xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/filesGridView"
-                android:numColumns="auto_fit"
-                android:gravity="center"
-                android:columnWidth="200dp"
-                android:stretchMode="columnWidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:longClickable="true">
-            </GridView>
+            <ListView
+                android:id="@+id/file_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
         </RelativeLayout>
         <RelativeLayout
             android:id="@+id/graph_menu_layout"
@@ -54,24 +55,33 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
                     <Button
+                        android:id="@+id/menu_open_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#f4fa1f56"
+                        android:text="меню"
+                        android:textColor="#ffffff"/>
+                    <Button
+                        android:id="@+id/folder_add_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#f0aa0056"
+                        android:text="+папка"
+                        android:textColor="#ffffff"/>
+                    <Button
+                        android:id="@+id/listen_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="#ff050f56"
                         android:text="микрофон"
-                        android:textColor="#ffffff"
-                        android:onClick="recordSound"/>
+                        android:textColor="#ffffff" />
                     <Button
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="#f4fa1f56" />
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="#fff5ff06" />
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="#ff05ff56" />
+                        android:background="#000000"
+                        android:text="теги"
+                        android:id="@+id/tags_open_button"
+                        android:textColor="#ffffff"/>
                 </LinearLayout>
         </RelativeLayout>
     </LinearLayout>
