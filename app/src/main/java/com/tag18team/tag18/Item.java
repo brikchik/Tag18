@@ -1,30 +1,30 @@
 package com.tag18team.tag18;
 public class Item {
 	private int idImg;
-	private long fileID;
+	private long ID;
 	private String name;
-	private String path;
-	private boolean is_external;
-	public Item(Integer id, String name, String path, boolean is_external) {
-		this.fileID = id;
-		this.path = path;
+	private String pathOrDescription;
+	private boolean isExternalOrFavourite;
+	public Item(Integer id, String name, String pathOrDescription, boolean isExternalOrFavourite) {
+		this.ID = id;
+		this.pathOrDescription = pathOrDescription;
 		this.name = name;
-		this.is_external=is_external;
+		this.isExternalOrFavourite=isExternalOrFavourite;
 	}
 	public String getName() {
 		return name;
 	}
-	public String getPath() {
-		return path;
+	public String getPathOrDescription() {
+		return pathOrDescription;
 	}
 	public long getID() {
-		return fileID;
+		return ID;
 	}
 	public boolean isExternal(){
-		return is_external;
+		return isExternalOrFavourite;
 	}
-	public void setPath(String path) {
-		this.path=path;
+	public void setPathOrDescription(String pathOrDescription) {
+		this.pathOrDescription=pathOrDescription;
 	}
 	public void setIdImg(int idImg) {
 		this.idImg = idImg;

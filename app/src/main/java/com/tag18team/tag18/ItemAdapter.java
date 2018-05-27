@@ -2,6 +2,7 @@ package com.tag18team.tag18;
 import java.util.List;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,10 @@ import android.widget.TextView;
 public class ItemAdapter extends ArrayAdapter<Item> {
 	private List<Item> itemList;
 	private Context context;
-	public ItemAdapter(List<Item> itemList, Context ctx) {
+	private boolean uses_tags=false;
+	public ItemAdapter(List<Item> itemList, Context ctx, boolean uses_tags) {
 		super(ctx, R.layout.img_row_layout, itemList);
+		this.uses_tags=uses_tags;
 		this.itemList = itemList;
 		this.context = ctx;
 	}
@@ -35,7 +38,10 @@ public class ItemAdapter extends ArrayAdapter<Item> {
 			TextView tv = (TextView) v.findViewById(R.id.e_name);
 			TextView distView = (TextView) v.findViewById(R.id.dist);
 			ImageView imageView = (ImageView) v.findViewById(R.id.img);
-			holder.FileItemNameView = tv;
+			ImageView imageView2 = (ImageView) v.findViewById(R.id.img2);
+			if (uses_tags) imageView2.setImageResource(R.drawable.planet);
+			////////////////////////////////////////////////////////
+			holder.ItemNameView = tv;
 			holder.distView = distView;
 			holder.icon = imageView;
 			v.setTag(holder);
@@ -44,15 +50,15 @@ public class ItemAdapter extends ArrayAdapter<Item> {
 			holder = (ItemHolder) v.getTag();
 		
 		Item p = itemList.get(position);
-		holder.FileItemNameView.setText(p.getName());
-		holder.distView.setText("" + p.getPath());
+		holder.ItemNameView.setText(p.getName());
+		holder.distView.setText("" + p.getPathOrDescription());
 		//holder.external.setChecked(p.isExternal());
 		holder.icon.setImageResource(R.drawable.planet);
 		//////////////////////////////////////////////////////
 		return v;
 	}
 	public static class ItemHolder {
-		public TextView FileItemNameView;
+		public TextView ItemNameView;
 		public TextView distView;
 		public ImageView icon;
 		public CheckBox external;

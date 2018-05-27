@@ -1,16 +1,20 @@
 package com.tag18team.tag18;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.AppCompatTextView;
 import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,17 +24,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import static java.lang.System.exit;
@@ -49,35 +51,37 @@ public class MainActivity extends AppCompatActivity
         new Thread(afsp).start();
     }
     private ArrayMap<String, String> tagsInfo=new ArrayMap<String,String>(); // contains tag descriptions
-    private void fillTags(){
-        DBhandler db=new DBhandler(this);
-        String[][] allTags=db.getAllRows("TAGS");
-        String[] tags=new String[allTags.length];
-        for(int row = 0; row < allTags.length; row++) {
-            if (!tagsInfo.containsKey(allTags[row][1]))tagsInfo.put(allTags[row][1], allTags[row][2]);
-            tags[row]=allTags[row][1];
+    private void fillTags() {
+        DBhandler db = new DBhandler(this);
+        String[][] allTags = db.getAllRows("TAGS");
+        String[] tags = new String[allTags.length];
+        ArrayList<Item> tagList=new ArrayList<>();
+        for (int row = 0; row < allTags.length; row++) {
+            if (!tagsInfo.containsKey(allTags[row][1]))
+                tagsInfo.put(allTags[row][1], allTags[row][2]);
+            tags[row] = allTags[row][1];
+            tagList.add(new Item(Integer.parseInt(allTags[row][0]), allTags[row][1],
+                    allTags[row][2], Boolean.parseBoolean(allTags[row][3])));
         }
-        if (fileChosenMode){
-            long fileID=db.getIfExists("FILES","FILE_ID","PATH",fileChosenPath);
-            for(int row = 0; row < allTags.length; row++) {
-                Cursor result=db.getReadableDatabase().rawQuery(
+        if (fileChosenMode) {
+            long fileID = db.getIfExists("FILES", "FILE_ID", "PATH", fileChosenPath);
+            for (int row = 0; row < allTags.length; row++) {
+                Cursor result = db.getReadableDatabase().rawQuery(
                         "SELECT FILE_ID FROM RELATIONS " +
-                                "WHERE TAG_ID="+allTags[row][0]+" " +
-                                "AND FILE_ID="+fileID+";",null);
-                if (result.getCount()>0)tags[row]="[Выбран] "+tags[row];
+                                "WHERE TAG_ID=" + allTags[row][0] + " " +
+                                "AND FILE_ID=" + fileID + ";", null);
+                if (result.getCount() > 0) tags[row] = "[Выбран] " + tags[row];
             }
         }
         ListView listView = (ListView) findViewById(R.id.tagsListView);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, tags);
+        ItemAdapter adapter = new ItemAdapter(tagList, this, true);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                setTag(""+((AppCompatTextView) v).getText());
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                setTag(""+((ItemAdapter.ItemHolder)v.getTag()).ItemNameView.getText());
             }
         });
-        }
+    }
     public void fillFiles(String[] tags) {
         DBhandler db=new DBhandler(this);
         String[][] allFiles;
@@ -88,7 +92,7 @@ public class MainActivity extends AppCompatActivity
                     allFiles[row][2],Boolean.parseBoolean(allFiles[row][3])));
         }
         ListView listView = (ListView) findViewById(R.id.file_list_view);
-        ItemAdapter adapter = new ItemAdapter(fileList, this);
+        ItemAdapter adapter = new ItemAdapter(fileList, this, false);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id)
@@ -109,17 +113,6 @@ public class MainActivity extends AppCompatActivity
         String request=editText.getText().toString().toLowerCase();
         fillFiles(request.split(" "));
         fillTags();
-    }
-    public void recordSound(){
-        if (ContextCompat.checkSelfPermission(getParent().getApplicationContext(),
-                Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.RECORD_AUDIO},
-                    10);
-        } // ask for permission in advance}
-        AudioInput audioInput=new AudioInput();
-        audioInput.startVoiceRecognitionActivity();
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,9 +141,7 @@ public class MainActivity extends AppCompatActivity
         findViewById(R.id.listen_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recordSound();
-                //finish();
-                //recordSound();
+                startVoiceRecognitionActivity();
             }
         });
         findViewById(R.id.menu_open_button).setOnClickListener(new View.OnClickListener() {
@@ -278,7 +269,7 @@ public class MainActivity extends AppCompatActivity
             if((pattern=="") || (pattern.endsWith(" ")))pattern+=tag;
             else pattern+=(" "+tag);
             editText.setText(pattern);
-            fillFiles(new View(this)); //dummy view
+            fillFiles(new View(this));
             ((DrawerLayout) findViewById(R.id.drawer_layout)).closeDrawer(GravityCompat.END);
             }
         }
@@ -315,5 +306,55 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+    private void startVoiceRecognitionActivity() {
+        boolean can_recognize_speech=false;
+        try {
+            PackageManager pm = getPackageManager();
+            List activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+            if (activities.size() != 0) {
+                 can_recognize_speech=true;
+            }
+        } catch (Exception e) {}
+        if (!can_recognize_speech) {
+            Toast.makeText(this, "Чтобы активировать голосовой поиск необходимо установить \"Голосовой поиск Google\"", Toast.LENGTH_LONG).show();
+            installGoogleVoiceSearch(this);
+            }
+            else {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ru-RU");
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Назовите теги");
+            startActivityForResult(intent, 5);
+        }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 5 && resultCode == RESULT_OK) {
+            if (resultCode == RESULT_OK) {
+                ArrayList<String> textMatchList = data
+                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                setTag(textMatchList.get(0));
+                super.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+    }
+    private static void installGoogleVoiceSearch(final Activity ownerActivity) {
+        Dialog dialog = new AlertDialog.Builder(ownerActivity)
+                .setMessage("Для распознавания речи необходимо установить \"Голосовой поиск Google\"")
+                .setTitle("Внимание")	// заголовок диалога
+                .setPositiveButton("Установить", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.google.android.voicesearch"));
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                            ownerActivity.startActivity(intent);
+                        } catch (Exception ex) {}
+                    }})
+                .setNegativeButton("Отмена", null)	// негативная кнопка
+                .create();
+        dialog.show();
     }
 }
